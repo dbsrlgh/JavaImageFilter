@@ -38,9 +38,13 @@ public class FiltersListFragment extends BottomSheetDialogFragment implements Fi
     ThumbnailAdapter thumbnailAdapter;
     List<ThumbnailItem> thumbnailItems;
     FiltersListFragmentListener filtersListFragmentListener;
-    static FiltersListFragment filtersListFragmentInstance;
 
-    public static FiltersListFragment getInstance(){
+    static FiltersListFragment filtersListFragmentInstance;
+    static Bitmap bitmap;
+
+    public static FiltersListFragment getInstance(Bitmap bitmapSave){
+        bitmap = bitmapSave;
+
         if(filtersListFragmentInstance == null){
             filtersListFragmentInstance = new FiltersListFragment();
         }
@@ -76,7 +80,7 @@ public class FiltersListFragment extends BottomSheetDialogFragment implements Fi
         thumbnailRecyclerView.addItemDecoration(new SpacesItemDecoration(space));
         thumbnailRecyclerView.setAdapter(thumbnailAdapter);
 
-        displayThumbnail(null);
+        displayThumbnail(bitmap);
 
         return itemView;
     }

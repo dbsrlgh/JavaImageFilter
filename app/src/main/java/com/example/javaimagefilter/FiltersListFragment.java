@@ -19,6 +19,7 @@ import com.example.javaimagefilter.Adapter.ThumbnailAdapter;
 import com.example.javaimagefilter.Interface.FiltersListFragmentListener;
 import com.example.javaimagefilter.Utils.BitmapUtils;
 import com.example.javaimagefilter.Utils.SpacesItemDecoration;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.zomato.photofilters.FilterPack;
 import com.zomato.photofilters.imageprocessors.Filter;
 import com.zomato.photofilters.utils.ThumbnailItem;
@@ -31,12 +32,20 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class FiltersListFragment extends Fragment implements FiltersListFragmentListener{
+public class FiltersListFragment extends BottomSheetDialogFragment implements FiltersListFragmentListener{
 
     RecyclerView thumbnailRecyclerView;
     ThumbnailAdapter thumbnailAdapter;
     List<ThumbnailItem> thumbnailItems;
     FiltersListFragmentListener filtersListFragmentListener;
+    static FiltersListFragment filtersListFragmentInstance;
+
+    public static FiltersListFragment getInstance(){
+        if(filtersListFragmentInstance == null){
+            filtersListFragmentInstance = new FiltersListFragment();
+        }
+        return filtersListFragmentInstance;
+    }
 
     public void setFiltersListFragmentListener(FiltersListFragmentListener filtersListFragmentListener) {
         this.filtersListFragmentListener = filtersListFragmentListener;

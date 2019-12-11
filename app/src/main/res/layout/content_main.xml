@@ -11,29 +11,94 @@
     tools:context=".MainActivity"
     tools:ShowIn="@layout/activity_main">
 
-    <ImageView
+    <ja.burhanrashid52.photoeditor.PhotoEditorView
         android:id="@+id/activity_main_image_preview"
         android:scaleType="centerCrop"
         android:layout_width="match_parent"
         android:layout_height="360dp"/>
 
-    <com.example.javaimagefilter.Utils.NonSwipeableViewPager
-        android:id="@+id/activity_main_viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_below="@+id/activity_main_image_preview"
-        android:layout_above="@+id/activity_main_tabs"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        />
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/activity_main_tabs"
+    <HorizontalScrollView
         android:layout_alignParentBottom="true"
+        android:fillViewport="true"
+        android:measureAllChildren="false"
+        android:scrollbars="none"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        />
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btn_filters_list"
+                android:padding="16dp"
+                app:cardBackgroundColor="@color/card_background_color"
+                android:layout_width="80dp"
+                android:layout_height="80dp">
+
+                <LinearLayout
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/ic_image_white_24dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="필터"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:textAlignment="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/btn_edit"
+                android:padding="16dp"
+                app:cardBackgroundColor="@color/card_background_color"
+                android:layout_width="80dp"
+                android:layout_height="80dp">
+
+                <LinearLayout
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:orientation="vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:layout_gravity="center_horizontal"
+                        android:src="@drawable/ic_edit_white_24dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:text="수정"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        android:textAlignment="center"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+
+    </HorizontalScrollView>
 
 
 </RelativeLayout>

@@ -39,4 +39,10 @@ dependencies {
      * - ImageFilter is original package from Zomato, and modify from AndroidHive to add filter pack
      * **/
     implementation 'info.androidhive:imagefilters:1.0.7'
+    /** PhotoEditor Library**/
+    implementation 'ja.burhanrashid52:photoeditor:0.4.0'
+    /** Support Design Library**/
+    implementation 'com.android.support:support-v4:29.0.2'
+    /** CardView Library **/
+    implementation 'androidx.cardview:cardview:1.0.0'
 }

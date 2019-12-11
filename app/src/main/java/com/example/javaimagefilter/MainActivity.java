@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewpager.widget.ViewPager;
 
@@ -38,20 +39,26 @@ import com.zomato.photofilters.imageprocessors.subfilters.SaturationSubfilter;
 import java.io.IOException;
 import java.util.List;
 
+import ja.burhanrashid52.photoeditor.OnSaveBitmap;
+import ja.burhanrashid52.photoeditor.PhotoEditor;
+import ja.burhanrashid52.photoeditor.PhotoEditorView;
+
 public class MainActivity extends AppCompatActivity implements FiltersListFragmentListener, EditImageFragmentListener {
 
     public static final String pictureName = "flash.jpg";
     public static final int PERMISSION_PICK_IMAGE = 1000;
 
-    ImageView mainActivityImgPreview;
-    TabLayout mainActivityTabLayout;
-    ViewPager mainActivityViewPager;
+    PhotoEditorView mainActivityPhotoEditorView;
+    PhotoEditor mainActivityPhotoEditor;
+
     CoordinatorLayout mainActivityCoordinatorLayout;
 
     Bitmap mainActivityOriginalBitmap, mainActivityFilteredBitmap, mainActivityFinalBitmap;
 
     FiltersListFragment mainActivityFiltersListFragment;
     EditImageFragment mainActivityEditImageFragment;
+
+    CardView btn_filters_list, btn_edit;
 
     int mainActivityBrightnessFinal = 0;
     float mainActivitySaturationFinal = 1.0f;
@@ -74,21 +81,41 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         getSupportActionBar().setTitle("Instagram Filter");
 
         //View
-        mainActivityImgPreview = (ImageView) findViewById(R.id.activity_main_image_preview);
-        mainActivityTabLayout = (TabLayout) findViewById(R.id.activity_main_tabs);
-        mainActivityViewPager = (ViewPager) findViewById(R.id.activity_main_viewPager);
+        mainActivityPhotoEditorView = (PhotoEditorView) findViewById(R.id.activity_main_image_preview);
+        mainActivityPhotoEditor = new PhotoEditor
+                .Builder(this, mainActivityPhotoEditorView)
+                .setPinchTextScalable(true).build();
+
         mainActivityCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.activity_main_coordinator);
 
+        btn_filters_list = (CardView) findViewById(R.id.btn_filters_list);
+        btn_filters_list.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FiltersListFragment mainActivityFiltersListFragment = FiltersListFragment.getInstance();
+                mainActivityFiltersListFragment.setFiltersListFragmentListener(MainActivity.this);
+                mainActivityFiltersListFragment.show(getSupportFragmentManager(), mainActivityFiltersListFragment.getTag());
+            }
+        });
+
+        btn_edit = (CardView) findViewById(R.id.btn_edit);
+        btn_edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EditImageFragment mainActiityEditImageFragment = EditImageFragment.getInstance();
+                mainActiityEditImageFragment.setEditImageFragmentListener(MainActivity.this);
+                mainActiityEditImageFragment.show(getSupportFragmentManager(), mainActiityEditImageFragment.getTag());
+            }
+        });
+
         loadImage();
-        setupViewPager(mainActivityViewPager);
-        mainActivityTabLayout.setupWithViewPager(mainActivityViewPager);
     }
 
     private void loadImage() {
         mainActivityOriginalBitmap = BitmapUtils.getBitmapFromAssets(this, pictureName, 300, 300);
         mainActivityFilteredBitmap = mainActivityOriginalBitmap.copy(Bitmap.Config.ARGB_8888, true);
         mainActivityFinalBitmap = mainActivityOriginalBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        mainActivityImgPreview.setImageBitmap(mainActivityOriginalBitmap);
+        mainActivityPhotoEditorView.getSource().setImageBitmap(mainActivityOriginalBitmap);
     }
 
     private void setupViewPager(ViewPager mainActivityViewPager) {
@@ -110,7 +137,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         mainActivityBrightnessFinal = brightness;
         Filter myFilterInBrightness = new Filter();
         myFilterInBrightness.addSubFilter(new BrightnessSubFilter(brightness));
-        mainActivityImgPreview.setImageBitmap(myFilterInBrightness.processFilter(mainActivityFinalBitmap.copy(Bitmap.Config.ARGB_8888, true)));
+        mainActivityPhotoEditorView.getSource().setImageBitmap(myFilterInBrightness.processFilter(mainActivityFinalBitmap.copy(Bitmap.Config.ARGB_8888, true)));
     }
 
     @Override
@@ -118,7 +145,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         mainActivitySaturationFinal = saturation;
         Filter myFilterInSaturation = new Filter();
         myFilterInSaturation.addSubFilter(new SaturationSubfilter(saturation));
-        mainActivityImgPreview.setImageBitmap(myFilterInSaturation.processFilter(mainActivityFinalBitmap.copy(Bitmap.Config.ARGB_8888, true)));
+        mainActivityPhotoEditorView.getSource().setImageBitmap(myFilterInSaturation.processFilter(mainActivityFinalBitmap.copy(Bitmap.Config.ARGB_8888, true)));
     }
 
     @Override
@@ -126,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         mainActivityContrastFinal = contrast;
         Filter myFilterInContrast = new Filter();
         myFilterInContrast.addSubFilter(new ContrastSubFilter(contrast));
-        mainActivityImgPreview.setImageBitmap(myFilterInContrast.processFilter(mainActivityFinalBitmap.copy(Bitmap.Config.ARGB_8888, true)));
+        mainActivityPhotoEditorView.getSource().setImageBitmap(myFilterInContrast.processFilter(mainActivityFinalBitmap.copy(Bitmap.Config.ARGB_8888, true)));
     }
 
     @Override
@@ -150,7 +177,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
     public void onFilterSelected(Filter filter) {
         resetControl();
         mainActivityFilteredBitmap = mainActivityOriginalBitmap.copy(Bitmap.Config.ARGB_8888, true);
-        mainActivityImgPreview.setImageBitmap(filter.processFilter(mainActivityFilteredBitmap));
+        mainActivityPhotoEditorView.getSource().setImageBitmap(filter.processFilter(mainActivityFilteredBitmap));
         mainActivityFinalBitmap = mainActivityFilteredBitmap.copy(Bitmap.Config.ARGB_8888, true);
     }
 
@@ -194,34 +221,47 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         if(report.areAllPermissionsGranted()){
-                            try {
-                                final String imagePathSelectedAndFiltered = BitmapUtils.insertImage(getContentResolver(),
-                                        mainActivityFinalBitmap,
-                                        System.currentTimeMillis() + "profile.jpg", null);
+                            mainActivityPhotoEditor.saveAsBitmap(new OnSaveBitmap() {
+                                @Override
+                                public void onBitmapReady(Bitmap saveBitmap) {
+                                    try {
 
-                                if(!TextUtils.isEmpty(imagePathSelectedAndFiltered)){
-                                    Snackbar snackbar = Snackbar.make(mainActivityCoordinatorLayout,
-                                            "Image saved to Gallery!",
-                                            Snackbar.LENGTH_LONG)
-                                            .setAction("OPEN", new View.OnClickListener() {
-                                                @Override
-                                                public void onClick(View v) {
-                                                    openImage(imagePathSelectedAndFiltered);
-                                                }
-                                            });
-                                    snackbar.show();
+                                        mainActivityPhotoEditorView.getSource().setImageBitmap(saveBitmap);
+
+                                        final String imagePathSelectedAndFiltered = BitmapUtils.insertImage(getContentResolver(),
+                                                saveBitmap,
+                                                System.currentTimeMillis() + "profile.jpg", null);
+
+                                        if(!TextUtils.isEmpty(imagePathSelectedAndFiltered)){
+                                            Snackbar snackbar = Snackbar.make(mainActivityCoordinatorLayout,
+                                                    "Image saved to Gallery!",
+                                                    Snackbar.LENGTH_LONG)
+                                                    .setAction("OPEN", new View.OnClickListener() {
+                                                        @Override
+                                                        public void onClick(View v) {
+                                                            openImage(imagePathSelectedAndFiltered);
+                                                        }
+                                                    });
+                                            snackbar.show();
+                                        }
+
+                                        else{
+                                            Snackbar snackbar = Snackbar.make(mainActivityCoordinatorLayout,
+                                                    "Unable to save Image!",
+                                                    Snackbar.LENGTH_LONG);
+                                            snackbar.show();
+                                        }
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
                                 }
 
-                                else{
-                                    Snackbar snackbar = Snackbar.make(mainActivityCoordinatorLayout,
-                                            "Unable to save Image!",
-                                            Snackbar.LENGTH_LONG);
-                                    snackbar.show();
-                                }
+                                @Override
+                                public void onFailure(Exception e) {
 
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                                }
+                            });
                         }
 
                         else{
@@ -281,7 +321,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
             mainActivityOriginalBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true);
             mainActivityFilteredBitmap = mainActivityOriginalBitmap.copy(Bitmap.Config.ARGB_8888, true);
             mainActivityFinalBitmap = mainActivityOriginalBitmap.copy(Bitmap.Config.ARGB_8888, true);
-            mainActivityImgPreview.setImageBitmap(mainActivityOriginalBitmap);
+            mainActivityPhotoEditorView.getSource().setImageBitmap(mainActivityOriginalBitmap);
             bitmap.recycle();
 
             // render selected img thumbnail

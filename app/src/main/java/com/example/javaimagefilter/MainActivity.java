@@ -258,7 +258,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         }
 
         else if(id == R.id.action_camera){
-            openCamera();
+            //openCamera();
             return true;
         }
         
@@ -408,6 +408,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
                 mainActivityPhotoEditorView.getSource().setImageBitmap(mainActivityOriginalBitmap);
                 bitmap.recycle();
 
+                // fix Crash FilterListFragment
                 mainActivityFiltersListFragment = FiltersListFragment.getInstance(mainActivityOriginalBitmap);
                 mainActivityFiltersListFragment.setFiltersListFragmentListener(this);
                 // render selected img thumbnail

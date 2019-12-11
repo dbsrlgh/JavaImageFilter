@@ -11,6 +11,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.javaimagefilter.Adapter.ViewPagerAdapter;
+import com.example.javaimagefilter.Interface.BrushFragmentListener;
 import com.example.javaimagefilter.Interface.EditImageFragmentListener;
 import com.example.javaimagefilter.Interface.FiltersListFragmentListener;
 import com.example.javaimagefilter.Utils.BitmapUtils;
@@ -43,7 +45,7 @@ import ja.burhanrashid52.photoeditor.OnSaveBitmap;
 import ja.burhanrashid52.photoeditor.PhotoEditor;
 import ja.burhanrashid52.photoeditor.PhotoEditorView;
 
-public class MainActivity extends AppCompatActivity implements FiltersListFragmentListener, EditImageFragmentListener {
+public class MainActivity extends AppCompatActivity implements FiltersListFragmentListener, EditImageFragmentListener, BrushFragmentListener {
 
     public static final String pictureName = "flash.jpg";
     public static final int PERMISSION_PICK_IMAGE = 1000;
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
     FiltersListFragment mainActivityFiltersListFragment;
     EditImageFragment mainActivityEditImageFragment;
 
-    CardView btn_filters_list, btn_edit;
+    CardView btn_filters_list, btn_edit, btn_brush, btn_emoticon;
 
     int mainActivityBrightnessFinal = 0;
     float mainActivitySaturationFinal = 1.0f;
@@ -84,7 +86,8 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         mainActivityPhotoEditorView = (PhotoEditorView) findViewById(R.id.activity_main_image_preview);
         mainActivityPhotoEditor = new PhotoEditor
                 .Builder(this, mainActivityPhotoEditorView)
-                .setPinchTextScalable(true).build();
+                .setPinchTextScalable(true)
+                .build();
 
         mainActivityCoordinatorLayout = (CoordinatorLayout) findViewById(R.id.activity_main_coordinator);
 
@@ -102,9 +105,24 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
         btn_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditImageFragment mainActiityEditImageFragment = EditImageFragment.getInstance();
-                mainActiityEditImageFragment.setEditImageFragmentListener(MainActivity.this);
-                mainActiityEditImageFragment.show(getSupportFragmentManager(), mainActiityEditImageFragment.getTag());
+                EditImageFragment mainActivityEditImageFragment = EditImageFragment.getInstance();
+                mainActivityEditImageFragment.setEditImageFragmentListener(MainActivity.this);
+                mainActivityEditImageFragment.show(getSupportFragmentManager(), mainActivityEditImageFragment.getTag());
+            }
+        });
+
+        btn_brush = (CardView) findViewById(R.id.btn_brush);
+        btn_brush.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // Enable Brush Mode
+                mainActivityPhotoEditor.setBrushDrawingMode(true);
+
+                BrushFragment mainActivityBrushFragment = BrushFragment.getInstance();
+                mainActivityBrushFragment.setBrushFragmentListener(MainActivity.this);
+                mainActivityBrushFragment.show(getSupportFragmentManager(), mainActivityBrushFragment.getTag());
+
             }
         });
 
@@ -328,5 +346,31 @@ public class MainActivity extends AppCompatActivity implements FiltersListFragme
             mainActivityFiltersListFragment.displayThumbnail(mainActivityOriginalBitmap);
         }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
+    public void onBrushSizeChangedListener(float size) {
+        mainActivityPhotoEditor.setBrushSize(size);
+    }
+
+    @Override
+    public void onBrushOpacityChangedListener(int opacity) {
+        mainActivityPhotoEditor.setOpacity(opacity);
+    }
+
+    @Override
+    public void onBrushColorChangedListener(int color) {
+        mainActivityPhotoEditor.setBrushColor(color);
+    }
+
+    @Override
+    public void onBrushStateChangedListener(boolean isEraser) {
+        if(isEraser){
+            mainActivityPhotoEditor.brushEraser();
+        }
+
+        else{
+            mainActivityPhotoEditor.setBrushDrawingMode(true);
+        }
     }
 }

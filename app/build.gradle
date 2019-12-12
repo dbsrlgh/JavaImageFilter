@@ -33,10 +33,12 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
     /** Dexter Library
      * - new Library help you easy to request runtime permission
+     * - to request runtime permission and handle easy
      * **/
     implementation 'com.karumi:dexter:6.0.1'
     /** Android Photo Filters Library
      * - ImageFilter is original package from Zomato, and modify from AndroidHive to add filter pack
+     * - Original package from Zomato, but AndroidHive have modify to add Filter pack
      * **/
     implementation 'info.androidhive:imagefilters:1.0.7'
     /** PhotoEditor Library**/
